@@ -15,8 +15,7 @@
  */
 package org.kaazing.gateway.service.http.balancer;
 
-import static java.util.concurrent.TimeUnit.SECONDS;
-
+import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
@@ -25,6 +24,8 @@ import org.kaazing.gateway.server.test.config.GatewayConfiguration;
 import org.kaazing.gateway.server.test.config.builder.GatewayConfigurationBuilder;
 import org.kaazing.test.util.ITUtil;
 import org.kaazing.test.util.ResolutionTestUtils;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class ClusterBalancerServiceIT {
     private static String networkInterface = ResolutionTestUtils.getLoopbackInterface();
@@ -62,6 +63,29 @@ public class ClusterBalancerServiceIT {
         //only throwing exception when trace data needed
         // this test should always pass
        // throw new Exception("Excpetion");
+        try{} catch (Exception e) {
+            // This is an ugly hack, necessitated by Bamboo running in EC2
+            // (which requires a very different cluster configuration) vs
+            // developers running these tests on our local machines (which
+            // explicitly do NOT want to configured for clustering in EC2).
+
+            String message;
+
+            if (e instanceof RuntimeException) {
+                message = e.getCause().getMessage();
+
+            } else {
+                message = e.getMessage();
+            }
+
+            // This exception happens if this test is run while in
+            // EC2.  As such, we expect this test to fail, so ignore
+            // the exception.
+            if (!message.contains("not supported on AWS")) {
+                System.out.println("expected on Travis build" + e.getMessage());
+                Assume.assumeTrue(false);
+            }
+        }
     }
 
     /**
