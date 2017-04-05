@@ -65,7 +65,9 @@ public class ClusterBalancerServiceIT {
         //only throwing exception when trace data needed
         // this test should always pass
        // throw new Exception("Excpetion");
-        try{} catch (Exception e) {
+        try{
+            System.out.println("TESTSTSTSTSTSTSTSTSTSTSTSTTSTSTSTSTSTSTS");
+        } catch (Exception e) {
             // This is an ugly hack, necessitated by Bamboo running in EC2
             // (which requires a very different cluster configuration) vs
             // developers running these tests on our local machines (which
