@@ -85,7 +85,7 @@ public class ClusterBalancerServiceIT {
             // the exception.
             if (message.contains("not supported on AWS")) {
                 System.out.println("expected on Travis build" + e.getMessage());
-                Assume.assumeTrue(true);
+                Assume.assumeTrue(false);
             }else{
                 throw e;
             }
