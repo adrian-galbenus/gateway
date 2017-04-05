@@ -25,6 +25,8 @@ import org.kaazing.gateway.server.test.config.builder.GatewayConfigurationBuilde
 import org.kaazing.test.util.ITUtil;
 import org.kaazing.test.util.ResolutionTestUtils;
 
+import java.util.concurrent.ExecutionException;
+
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class ClusterBalancerServiceIT {
@@ -71,7 +73,7 @@ public class ClusterBalancerServiceIT {
 
             String message;
 
-            if (e instanceof RuntimeException) {
+            if (e instanceof ExecutionException) {
                 message = e.getCause().getMessage();
 
             } else {
