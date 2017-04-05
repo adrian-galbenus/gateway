@@ -83,9 +83,11 @@ public class ClusterBalancerServiceIT {
             // This exception happens if this test is run while in
             // EC2.  As such, we expect this test to fail, so ignore
             // the exception.
-            if (!message.contains("not supported on AWS")) {
+            if (message.contains("not supported on AWS")) {
                 System.out.println("expected on Travis build" + e.getMessage());
-                Assume.assumeTrue(false);
+                Assume.assumeTrue(true);
+            }else{
+                throw e;
             }
         }
     }
