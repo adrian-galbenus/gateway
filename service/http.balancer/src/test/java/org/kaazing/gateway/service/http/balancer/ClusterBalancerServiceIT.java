@@ -16,16 +16,16 @@
 package org.kaazing.gateway.service.http.balancer;
 
 import org.junit.Assume;
+import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.RuleChain;
 import org.kaazing.gateway.server.test.GatewayClusterRule;
 import org.kaazing.gateway.server.test.config.GatewayConfiguration;
 import org.kaazing.gateway.server.test.config.builder.GatewayConfigurationBuilder;
+import org.kaazing.gateway.util.http.DefaultUtilityHttpClient;
 import org.kaazing.test.util.ITUtil;
 import org.kaazing.test.util.ResolutionTestUtils;
-
-import java.util.concurrent.ExecutionException;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -60,38 +60,17 @@ public class ClusterBalancerServiceIT {
     @Rule
     public RuleChain chain = ITUtil.createRuleChain(rule, 30, SECONDS);
 
+    @BeforeClass
+    public void checkOnAws(){
+        Assume.assumeTrue(onAws());
+    }
+
+
     @Test
     public void testLaunchBalancerService() throws Exception {
         //only throwing exception when trace data needed
         // this test should always pass
        // throw new Exception("Excpetion");
-        try{
-            System.out.println("TESTSTSTSTSTSTSTSTSTSTSTSTTSTSTSTSTSTSTS");
-        } catch (Exception e) {
-            // This is an ugly hack, necessitated by Bamboo running in EC2
-            // (which requires a very different cluster configuration) vs
-            // developers running these tests on our local machines (which
-            // explicitly do NOT want to configured for clustering in EC2).
-
-            String message;
-
-            if (e instanceof ExecutionException) {
-                message = e.getCause().getMessage();
-
-            } else {
-                message = e.getMessage();
-            }
-
-            // This exception happens if this test is run while in
-            // EC2.  As such, we expect this test to fail, so ignore
-            // the exception.
-            if (message.contains("not supported on AWS")) {
-                System.out.println("expected on Travis build" + e.getMessage());
-                Assume.assumeTrue(false);
-            }else{
-                throw e;
-            }
-        }
     }
 
     /**
@@ -122,5 +101,23 @@ public class ClusterBalancerServiceIT {
                     .balance(balancerURI1)
                 .done()
             .done();
+    }
+
+    private boolean onAws(){
+        boolean onAWS;
+        boolean onTravisCI = false;
+        DefaultUtilityHttpClient httpClient = new DefaultUtilityHttpClient();
+        try {
+            httpClient.performGetRequest("http://169.254.169.254/2014-02-25/meta-data/");
+            onAWS = true;
+            // Need to check if running on Travis CI, Travis CI uses AWS container virtualization. If this test runs on
+            // container on AWS then it will fail because the hostname it gets in the query will not map via dns to the
+            // IP address the container has.
+            onTravisCI = System.getenv().containsKey("TRAVIS");
+            return true;
+        } catch (Exception e) {
+            onAWS = false;
+            return false;
+        }
     }
 }
