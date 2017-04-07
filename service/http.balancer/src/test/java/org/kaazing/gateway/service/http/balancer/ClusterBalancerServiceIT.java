@@ -61,7 +61,7 @@ public class ClusterBalancerServiceIT {
     public RuleChain chain = ITUtil.createRuleChain(rule, 30, SECONDS);
 
     @BeforeClass
-    public void checkOnAws(){
+    public static void checkOnAws(){
         Assume.assumeTrue(!onAws());
     }
 
@@ -103,7 +103,7 @@ public class ClusterBalancerServiceIT {
             .done();
     }
 
-    private boolean onAws(){
+    private static boolean onAws(){
         DefaultUtilityHttpClient httpClient = new DefaultUtilityHttpClient();
         try {
             System.out.println("Checking if onAWS");
