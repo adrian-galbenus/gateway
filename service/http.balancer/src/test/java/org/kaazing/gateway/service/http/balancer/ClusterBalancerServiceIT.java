@@ -62,7 +62,7 @@ public class ClusterBalancerServiceIT {
 
     @BeforeClass
     public void checkOnAws(){
-        Assume.assumeTrue(onAws());
+        Assume.assumeTrue(!onAws());
     }
 
 
@@ -104,19 +104,12 @@ public class ClusterBalancerServiceIT {
     }
 
     private boolean onAws(){
-        boolean onAWS;
-        boolean onTravisCI = false;
         DefaultUtilityHttpClient httpClient = new DefaultUtilityHttpClient();
         try {
+            System.out.println("Checking if onAWS");
             httpClient.performGetRequest("http://169.254.169.254/2014-02-25/meta-data/");
-            onAWS = true;
-            // Need to check if running on Travis CI, Travis CI uses AWS container virtualization. If this test runs on
-            // container on AWS then it will fail because the hostname it gets in the query will not map via dns to the
-            // IP address the container has.
-            onTravisCI = System.getenv().containsKey("TRAVIS");
             return true;
         } catch (Exception e) {
-            onAWS = false;
             return false;
         }
     }
